@@ -49,7 +49,7 @@ namespace OpenRA.Graphics
 
 				renderer.Context.SetBlendMode(currentBlend);
 				shader.PrepareRender();
-				renderer.DrawBatch(vertices, nv, PrimitiveType.TriangleList);
+				renderer.DrawBatch(shader, vertices, nv, PrimitiveType.TriangleList);
 				renderer.Context.SetBlendMode(BlendMode.None);
 
 				nv = 0;
@@ -164,7 +164,7 @@ namespace OpenRA.Graphics
 			nv += 6;
 		}
 
-		public void DrawVertexBuffer(IVertexBuffer<Vertex> buffer, int start, int length, PrimitiveType type, IEnumerable<Sheet> sheets, BlendMode blendMode)
+		public void DrawVertexBuffer(IVertexBuffer buffer, int start, int length, PrimitiveType type, IEnumerable<Sheet> sheets, BlendMode blendMode)
 		{
 			var i = 0;
 			foreach (var s in sheets)
@@ -178,7 +178,7 @@ namespace OpenRA.Graphics
 
 			renderer.Context.SetBlendMode(blendMode);
 			shader.PrepareRender();
-			renderer.DrawBatch(buffer, start, length, type);
+			renderer.DrawBatch(shader, buffer, start, length, type);
 			renderer.Context.SetBlendMode(BlendMode.None);
 		}
 
