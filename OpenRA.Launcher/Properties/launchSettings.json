@@ -19,10 +19,14 @@
     "Red Alert - Test Map": {
       "commandName": "Project",
 <<<<<<< HEAD
+<<<<<<< HEAD
       "commandLineArgs": "Engine.EngineDir=\"..\" Game.Mod=ra Launch.Map=mods/ra/maps/a-nuclear-winter"
 =======
       "commandLineArgs": "Engine.EngineDir=\"..\" Game.Mod=ra Launch.Map=e1248630d8444f5b690ba10ae8cd85b1e2f9c5ea"
 >>>>>>> 1ddb05e22c (Initial commit 2)
+=======
+      "commandLineArgs": "Engine.EngineDir=\"..\" Game.Mod=ra Launch.Map=mods/ra/maps/a-nuclear-winter"
+>>>>>>> 3462677117 (Added support for Launch.Map= parameter to use relative directory paths)
     }
   }
 }

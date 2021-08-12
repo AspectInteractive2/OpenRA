@@ -957,8 +957,14 @@ namespace OpenRA
 			};
 
 			var package = new OpenRA.FileSystem.Folder(Platform.EngineDir).OpenPackage(launchMap, ModData.ModFiles);
+<<<<<<< HEAD
 			var map = ModData.MapCache.SingleOrDefault(m => m.Uid == launchMap) ??
 				ModData.MapCache.SingleOrDefault(m => m.Uid == Map.ComputeUID(package));
+=======
+			var launchMapUID = Map.ComputeUID(package);
+
+			var map = ModData.MapCache.SingleOrDefault(m => m.Uid == launchMapUID);
+>>>>>>> 3462677117 (Added support for Launch.Map= parameter to use relative directory paths)
 
 			if (map == null)
 				throw new InvalidOperationException($"Could not find map '{launchMap}'.");
