@@ -1,11 +1,13 @@
 mig:
 	idle:
 		Facings: 16
+		InterpolateIntermediateFacings: True
 	icon: migicon
 
 yak:
 	idle:
 		Facings: 16
+		InterpolateIntermediateFacings: True
 	muzzle: minigun
 		Length: 6
 		Facings: 8
@@ -66,10 +68,12 @@ tran2husk:
 u2:
 	idle:
 		Facings: 16
+		InterpolateIntermediateFacings: True
 
 badr:
 	idle:
 		Facings: 16
+		InterpolateIntermediateFacings: True
 
 mh60:
 	idle:
