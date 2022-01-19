@@ -36,7 +36,7 @@ namespace OpenRA.Graphics
 		float Scale { get; }
 
 		Sprite GetSprite(int frame);
-		Sprite GetSprite(int frame, WAngle facing);
+		Sprite GetSprite(int frame, WAngle facing, out int rotAngle);
 		Sprite GetShadow(int frame, WAngle facing);
 		float GetAlpha(int frame);
 	}

@@ -27,6 +27,7 @@ namespace OpenRA.Graphics
 		readonly Func<bool> paused;
 
 		int frame;
+		int rotAngle = 0;
 		bool backwards;
 		bool tickAlways;
 		int timeUntilNextFrame;
@@ -50,18 +51,23 @@ namespace OpenRA.Graphics
 		}
 
 		public int CurrentFrame => backwards ? CurrentSequence.Length - frame - 1 : frame;
-		public Sprite Image => CurrentSequence.GetSprite(CurrentFrame, facingFunc());
+
+		public Sprite Image => CurrentSequence.GetSprite(CurrentFrame, facingFunc(), out rotAngle);
 
 		public IRenderable[] Render(WPos pos, in WVec offset, int zOffset, PaletteReference palette)
 		{
 			var tintModifiers = CurrentSequence.IgnoreWorldTint ? TintModifiers.IgnoreWorldTint : TintModifiers.None;
 			var alpha = CurrentSequence.GetAlpha(CurrentFrame);
-			var imageRenderable = new SpriteRenderable(Image, pos, offset, CurrentSequence.ZOffset + zOffset, palette, CurrentSequence.Scale, alpha, float3.Ones, tintModifiers, IsDecoration);
+			var imageRenderable = new SpriteRenderable(Image, pos, offset, CurrentSequence.ZOffset + zOffset, palette,
+													   CurrentSequence.Scale, alpha, float3.Ones, tintModifiers, IsDecoration, 0,
+													   rotAngle);
 
 			if (CurrentSequence.ShadowStart >= 0)
 			{
 				var shadow = CurrentSequence.GetShadow(CurrentFrame, facingFunc());
-				var shadowRenderable = new SpriteRenderable(shadow, pos, offset, CurrentSequence.ShadowZOffset + zOffset, palette, CurrentSequence.Scale, 1f, float3.Ones, tintModifiers, true);
+				var shadowRenderable = new SpriteRenderable(shadow, pos, offset, CurrentSequence.ShadowZOffset + zOffset, palette,
+															CurrentSequence.Scale, 1f, float3.Ones, tintModifiers, true, 0,
+															rotAngle);
 				return new IRenderable[] { shadowRenderable, imageRenderable };
 			}
 

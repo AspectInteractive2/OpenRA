@@ -116,7 +116,7 @@ namespace OpenRA.Mods.Common.Graphics
 		bool ISpriteSequence.IgnoreWorldTint => throw exception;
 		float ISpriteSequence.Scale => throw exception;
 		Sprite ISpriteSequence.GetSprite(int frame) { throw exception; }
-		Sprite ISpriteSequence.GetSprite(int frame, WAngle facing) { throw exception; }
+		Sprite ISpriteSequence.GetSprite(int frame, WAngle facing, out int rotAngle) { throw exception; }
 		Sprite ISpriteSequence.GetShadow(int frame, WAngle facing) { throw exception; }
 		float ISpriteSequence.GetAlpha(int frame) { throw exception; }
 	}
@@ -136,6 +136,8 @@ namespace OpenRA.Mods.Common.Graphics
 		public int Length { get; private set; }
 		public int Stride { get; private set; }
 		public int Facings { get; private set; }
+		public bool InterpolateFacings { get; private set; }
+		public bool UseRotationsForFacings { get; private set; }
 		public int Tick { get; private set; }
 		public int ZOffset { get; private set; }
 		public float ZRamp { get; private set; }
@@ -195,6 +197,8 @@ namespace OpenRA.Mods.Common.Graphics
 				var flipY = LoadField(d, "FlipY", false);
 
 				Facings = LoadField(d, "Facings", 1);
+				InterpolateFacings = LoadField(d, "InterpolateIntermediateFacings", false);
+				UseRotationsForFacings = LoadField(d, "UseRotationsForFacings", false);
 				if (Facings < 0)
 				{
 					reverseFacings = true;
@@ -415,8 +419,22 @@ namespace OpenRA.Mods.Common.Graphics
 			return GetSprite(Start, frame, WAngle.Zero);
 		}
 
-		public Sprite GetSprite(int frame, WAngle facing)
+		public Sprite GetSprite(int frame, WAngle facing, out int rotAngle)
 		{
+			if (InterpolateFacings)
+			{
+				rotAngle = Util.AngleDiffToStep(facing, Facings);
+			}
+			else if (UseRotationsForFacings)
+			{
+				rotAngle = facing.Angle + 512;
+				facing = new WAngle(512); // If Rotations are being used for facings, force the initial facing North
+			}
+			else
+			{
+				rotAngle = 0;
+			}
+
 			return GetSprite(Start, frame, facing);
 		}
 

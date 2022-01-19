@@ -20,12 +20,26 @@ namespace OpenRA.Graphics
 		// yes, our channel order is nuts.
 		static readonly int[] ChannelMasks = { 2, 1, 0, 3 };
 
-		public static void FastCreateQuad(Vertex[] vertices, in float3 o, Sprite r, int2 samplers, float paletteTextureIndex, int nv, in float3 size, in float3 tint, float alpha)
+		public static void FastCreateQuad(Vertex[] vertices, in float3 o, Sprite r, int2 samplers, float paletteTextureIndex, int nv,
+										  in float3 size, in float3 tint, float alpha, in int rotAngle = 0)
 		{
+			var a = o;
 			var b = new float3(o.X + size.X, o.Y, o.Z);
 			var c = new float3(o.X + size.X, o.Y + size.Y, o.Z + size.Z);
 			var d = new float3(o.X, o.Y + size.Y, o.Z + size.Z);
-			FastCreateQuad(vertices, o, b, c, d, r, samplers, paletteTextureIndex, tint, alpha, nv);
+
+			// Rotate sprite if rotation angle is not equal to 0
+			if (rotAngle != 0)
+			{
+				var centerPoint = o + (size / 2);
+				var rotWAngle = new WAngle(rotAngle);
+				a = RotatePoint(o, centerPoint, -rotWAngle);
+				b = RotatePoint(b, centerPoint, -rotWAngle);
+				c = RotatePoint(c, centerPoint, -rotWAngle);
+				d = RotatePoint(d, centerPoint, -rotWAngle);
+			}
+
+			FastCreateQuad(vertices, a, b, c, d, r, samplers, paletteTextureIndex, tint, alpha, nv);
 		}
 
 		public static void FastCreateQuad(Vertex[] vertices,
@@ -246,6 +260,19 @@ namespace OpenRA.Graphics
 				}
 
 			return mtx;
+		}
+
+		// Using this method: https://stackoverflow.com/questions/2259476/rotating-a-point-about-another-point-2d
+		public static float3 RotatePoint(in float3 point, in float3 centerPoint, in WAngle angle)
+		{
+			var angleSin = (float)Math.Sin(angle.RendererRadians());
+			var angleCos = (float)Math.Cos(angle.RendererRadians());
+
+			var offsetPoint = point - centerPoint;
+			var rotatedPoint = new float3((offsetPoint.X * angleCos - offsetPoint.Y * angleSin) + centerPoint.X,
+										  (offsetPoint.X * angleSin + offsetPoint.Y * angleCos) + centerPoint.Y,
+										  offsetPoint.Z + centerPoint.Z);
+			return rotatedPoint;
 		}
 
 		public static float[] MatrixVectorMultiply(float[] mtx, float[] vec)
