@@ -116,7 +116,7 @@ namespace OpenRA.Mods.Common.Graphics
 		bool ISpriteSequence.IgnoreWorldTint => throw exception;
 		float ISpriteSequence.Scale => throw exception;
 		Sprite ISpriteSequence.GetSprite(int frame) { throw exception; }
-		Sprite ISpriteSequence.GetSprite(int frame, WAngle facing, out int rotAngle) { throw exception; }
+		Sprite ISpriteSequence.GetSprite(int frame, WAngle facing, out WAngle rotation) { throw exception; }
 		Sprite ISpriteSequence.GetShadow(int frame, WAngle facing) { throw exception; }
 		float ISpriteSequence.GetAlpha(int frame) { throw exception; }
 	}
@@ -419,20 +419,20 @@ namespace OpenRA.Mods.Common.Graphics
 			return GetSprite(Start, frame, WAngle.Zero);
 		}
 
-		public Sprite GetSprite(int frame, WAngle facing, out int rotAngle)
+		public Sprite GetSprite(int frame, WAngle facing, out WAngle rotation)
 		{
 			if (InterpolateFacings)
 			{
-				rotAngle = Util.AngleDiffToStep(facing, Facings);
+				rotation = Util.AngleDiffToStep(facing, Facings);
 			}
 			else if (UseRotationsForFacings)
 			{
-				rotAngle = facing.Angle + 512;
+				rotation = new WAngle(facing.Angle + 512);
 				facing = new WAngle(512); // If Rotations are being used for facings, force the initial facing North
 			}
 			else
 			{
-				rotAngle = 0;
+				rotation = WAngle.Zero;
 			}
 
 			return GetSprite(Start, frame, facing);
