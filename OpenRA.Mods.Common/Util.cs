@@ -74,11 +74,11 @@ namespace OpenRA.Mods.Common
 		}
 
 		// Returns the remainder angle after rounding to the nearest whole step / facing
-		public static int AngleDiffToStep(WAngle facing, int numFrames)
+		public static WAngle AngleDiffToStep(WAngle facing, int numFrames)
 		{
 			var step = 1024 / numFrames;
 			var a = (facing.Angle + step / 2) & 1023;
-			return a % step - step / 2;
+			return new WAngle(a % step - step / 2);
 		}
 
 		/// <summary>Rounds the given facing value to the nearest quantized step.</summary>

@@ -126,43 +126,44 @@ namespace OpenRA.Graphics
 			return pal.TextureIndex;
 		}
 
-		internal void DrawSprite(Sprite s, float paletteTextureIndex, in float3 location, in float3 scale, in int rotAngle = 0)
+		internal void DrawSprite(Sprite s, float paletteTextureIndex, in float3 location, in float3 scale, float rotation = 0F)
 		{
 			var samplers = SetRenderStateForSprite(s);
-			Util.FastCreateQuad(vertices, location + scale * s.Offset, s, samplers, paletteTextureIndex, nv,
-								scale * s.Size, float3.Ones, 1f, rotAngle);
+			Util.FastCreateQuad(vertices, location + scale * s.Offset, s, samplers, paletteTextureIndex, nv, scale * s.Size, float3.Ones,
+								1f, rotation);
 			nv += 6;
 		}
 
-		internal void DrawSprite(Sprite s, float paletteTextureIndex, in float3 location, float scale, in int rotAngle = 0)
+		internal void DrawSprite(Sprite s, float paletteTextureIndex, in float3 location, float scale, float rotation = 0F)
 		{
 			var samplers = SetRenderStateForSprite(s);
-			Util.FastCreateQuad(vertices, location + scale * s.Offset, s, samplers, paletteTextureIndex, nv,
-								scale * s.Size, float3.Ones, 1f, rotAngle);
+			Util.FastCreateQuad(vertices, location + scale * s.Offset, s, samplers, paletteTextureIndex, nv, scale * s.Size, float3.Ones,
+								1f, rotation);
 			nv += 6;
 		}
 
-		public void DrawSprite(Sprite s, PaletteReference pal, in float3 location, float scale = 1f, in int rotAngle = 0)
+		public void DrawSprite(Sprite s, PaletteReference pal, in float3 location, float scale = 1f, float rotation = 0F)
 		{
-			DrawSprite(s, ResolveTextureIndex(s, pal), location, scale, rotAngle);
+			DrawSprite(s, ResolveTextureIndex(s, pal), location, scale, rotation);
 		}
 
-		internal void DrawSprite(Sprite s, float paletteTextureIndex, in float3 location,
-								 float scale, in float3 tint, float alpha, in int rotAngle = 0)
+		internal void DrawSprite(Sprite s, float paletteTextureIndex, in float3 location, float scale, in float3 tint, float alpha,
+								 float rotation = 0F)
 		{
 			var samplers = SetRenderStateForSprite(s);
-			Util.FastCreateQuad(vertices, location + scale * s.Offset, s, samplers, paletteTextureIndex, nv,
-								scale * s.Size, tint, alpha, rotAngle);
+			Util.FastCreateQuad(vertices, location + scale * s.Offset, s, samplers, paletteTextureIndex, nv, scale * s.Size, tint, alpha,
+								rotation);
 			nv += 6;
 		}
 
-		public void DrawSprite(Sprite s, PaletteReference pal, in float3 location, float scale, in float3 tint, float alpha, in int rotAngle = 0)
+		public void DrawSprite(Sprite s, PaletteReference pal, in float3 location, float scale, in float3 tint, float alpha,
+							   float rotation = 0F)
 		{
-			DrawSprite(s, ResolveTextureIndex(s, pal), location, scale, tint, alpha, rotAngle);
+			DrawSprite(s, ResolveTextureIndex(s, pal), location, scale, tint, alpha, rotation);
 		}
 
-		internal void DrawSprite(Sprite s, float paletteTextureIndex, in float3 a, in float3 b, in float3 c, in float3 d,
-								 in float3 tint, float alpha)
+		internal void DrawSprite(Sprite s, float paletteTextureIndex, in float3 a, in float3 b, in float3 c, in float3 d, in float3 tint,
+								 float alpha)
 		{
 			var samplers = SetRenderStateForSprite(s);
 			Util.FastCreateQuad(vertices, a, b, c, d, s, samplers, paletteTextureIndex, tint, alpha, nv);

@@ -21,7 +21,7 @@ namespace OpenRA.Graphics
 		static readonly int[] ChannelMasks = { 2, 1, 0, 3 };
 
 		public static void FastCreateQuad(Vertex[] vertices, in float3 o, Sprite r, int2 samplers, float paletteTextureIndex, int nv,
-										  in float3 size, in float3 tint, float alpha, in int rotAngle = 0)
+										  in float3 size, in float3 tint, float alpha, in float rotation = 0F)
 		{
 			var a = o;
 			var b = new float3(o.X + size.X, o.Y, o.Z);
@@ -29,14 +29,15 @@ namespace OpenRA.Graphics
 			var d = new float3(o.X, o.Y + size.Y, o.Z + size.Z);
 
 			// Rotate sprite if rotation angle is not equal to 0
-			if (rotAngle != 0)
+			if (rotation != 0F)
 			{
 				var centerPoint = o + (size / 2);
-				var rotWAngle = new WAngle(rotAngle);
-				a = RotatePoint(o, centerPoint, -rotWAngle);
-				b = RotatePoint(b, centerPoint, -rotWAngle);
-				c = RotatePoint(c, centerPoint, -rotWAngle);
-				d = RotatePoint(d, centerPoint, -rotWAngle);
+				var angleSin = (float)Math.Sin(-rotation);
+				var angleCos = (float)Math.Cos(-rotation);
+				a = RotatePoint(o, centerPoint, angleSin, angleCos);
+				b = RotatePoint(b, centerPoint, angleSin, angleCos);
+				c = RotatePoint(c, centerPoint, angleSin, angleCos);
+				d = RotatePoint(d, centerPoint, angleSin, angleCos);
 			}
 
 			FastCreateQuad(vertices, a, b, c, d, r, samplers, paletteTextureIndex, tint, alpha, nv);
@@ -263,11 +264,8 @@ namespace OpenRA.Graphics
 		}
 
 		// Using this method: https://stackoverflow.com/questions/2259476/rotating-a-point-about-another-point-2d
-		public static float3 RotatePoint(in float3 point, in float3 centerPoint, in WAngle angle)
+		public static float3 RotatePoint(in float3 point, in float3 centerPoint, in float angleSin, in float angleCos)
 		{
-			var angleSin = (float)Math.Sin(angle.RendererRadians());
-			var angleCos = (float)Math.Cos(angle.RendererRadians());
-
 			var offsetPoint = point - centerPoint;
 			var rotatedPoint = new float3((offsetPoint.X * angleCos - offsetPoint.Y * angleSin) + centerPoint.X,
 										  (offsetPoint.X * angleSin + offsetPoint.Y * angleCos) + centerPoint.Y,
