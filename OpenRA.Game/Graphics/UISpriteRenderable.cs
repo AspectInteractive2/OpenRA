@@ -25,7 +25,7 @@ namespace OpenRA.Graphics
 		readonly float rotation;
 
 		public UISpriteRenderable(Sprite sprite, WPos effectiveWorldPos, int2 screenPos, int zOffset, PaletteReference palette,
-								  float scale = 1f, float alpha = 1f, float rotation = 0F)
+			float scale = 1f, float alpha = 1f, float rotation = 0F)
 		{
 			this.sprite = sprite;
 			this.effectiveWorldPos = effectiveWorldPos;
