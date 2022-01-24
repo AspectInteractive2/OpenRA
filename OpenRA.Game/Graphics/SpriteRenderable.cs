@@ -17,6 +17,7 @@ namespace OpenRA.Graphics
 	public class SpriteRenderable : IPalettedRenderable, IModifyableRenderable, IFinalizedRenderable
 	{
 		public static readonly IEnumerable<IRenderable> None = new IRenderable[0];
+
 		readonly Sprite sprite;
 		readonly WPos pos;
 		readonly WVec offset;
@@ -31,7 +32,7 @@ namespace OpenRA.Graphics
 		readonly int layer;
 
 		public SpriteRenderable(Sprite sprite, WPos pos, WVec offset, int zOffset, PaletteReference palette, float scale, float alpha,
-								float3 tint, TintModifiers tintModifiers, bool isDecoration, WAngle rotation, int layer = 0)
+			float3 tint, TintModifiers tintModifiers, bool isDecoration, WAngle rotation, int layer = 0)
 		{
 			this.sprite = sprite;
 			this.pos = pos;
@@ -54,7 +55,7 @@ namespace OpenRA.Graphics
 		}
 
 		public SpriteRenderable(Sprite sprite, WPos pos, WVec offset, int zOffset, PaletteReference palette, float scale, float alpha,
-								float3 tint, TintModifiers tintModifiers, bool isDecoration, int layer = 0)
+			float3 tint, TintModifiers tintModifiers, bool isDecoration, int layer = 0)
 		: this(sprite, pos, offset, zOffset, palette, scale, alpha, tint, tintModifiers, isDecoration, WAngle.Zero, layer) { }
 
 		public WPos Pos => pos + offset;

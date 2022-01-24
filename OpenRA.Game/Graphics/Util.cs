@@ -21,7 +21,7 @@ namespace OpenRA.Graphics
 		static readonly int[] ChannelMasks = { 2, 1, 0, 3 };
 
 		public static void FastCreateQuad(Vertex[] vertices, in float3 o, Sprite r, int2 samplers, float paletteTextureIndex, int nv,
-										  in float3 size, in float3 tint, float alpha, in float rotation = 0F)
+			in float3 size, in float3 tint, float alpha, in float rotation = 0F)
 		{
 			var a = o;
 			var b = new float3(o.X + size.X, o.Y, o.Z);
