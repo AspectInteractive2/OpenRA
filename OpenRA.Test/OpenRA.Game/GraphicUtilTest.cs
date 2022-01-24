@@ -9,6 +9,7 @@
  */
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -48,7 +49,9 @@ namespace OpenRA.Test
 			// Rotate each point
 			for (var i = 0; i < initialPoints.Count; i++)
 			{
-				var rotatedPoint = Util.RotatePoint(initialPoints.ElementAt(i), centerPoint, angleToRotate);
+				var angleToRotateSin = (float)Math.Sin(angleToRotate.RendererRadians());
+				var angleToRotateCos = (float)Math.Cos(angleToRotate.RendererRadians());
+				var rotatedPoint = Util.RotatePoint(initialPoints.ElementAt(i), centerPoint, angleToRotateSin, angleToRotateCos);
 				var expectedPoint = expectedRotatedPoints.ElementAt(i);
 
 				// Check the rotate points are correct
