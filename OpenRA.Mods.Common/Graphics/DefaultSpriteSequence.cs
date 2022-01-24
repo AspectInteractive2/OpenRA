@@ -136,8 +136,7 @@ namespace OpenRA.Mods.Common.Graphics
 		public int Length { get; private set; }
 		public int Stride { get; private set; }
 		public int Facings { get; private set; }
-		public bool InterpolateFacings { get; private set; }
-		public bool UseRotationsForFacings { get; private set; }
+		public int InterpolatedFacings { get; private set; }
 		public int Tick { get; private set; }
 		public int ZOffset { get; private set; }
 		public float ZRamp { get; private set; }
@@ -197,8 +196,11 @@ namespace OpenRA.Mods.Common.Graphics
 				var flipY = LoadField(d, "FlipY", false);
 
 				Facings = LoadField(d, "Facings", 1);
-				InterpolateFacings = LoadField(d, "InterpolateIntermediateFacings", false);
-				UseRotationsForFacings = LoadField(d, "UseRotationsForFacings", false);
+				InterpolatedFacings = LoadField(d, "InterpolatedFacings", -1);
+				if (InterpolatedFacings != -1 && !(InterpolatedFacings > 1 && InterpolatedFacings > Facings && InterpolatedFacings <= 1024
+					&& Exts.IsPowerOf2(InterpolatedFacings)))
+					throw new YamlException($"InterpolatedFacings must be greater than Facings, within the range of 2 to 1024, and a power of 2.");
+
 				if (Facings < 0)
 				{
 					reverseFacings = true;
@@ -421,19 +423,11 @@ namespace OpenRA.Mods.Common.Graphics
 
 		public Sprite GetSprite(int frame, WAngle facing, out WAngle rotation)
 		{
-			if (InterpolateFacings)
-			{
-				rotation = Util.AngleDiffToStep(facing, Facings);
-			}
-			else if (UseRotationsForFacings)
-			{
-				rotation = new WAngle(facing.Angle + 512);
-				facing = new WAngle(512); // If Rotations are being used for facings, force the initial facing North
-			}
+			// Note: Error checking is not done here as it is done on load
+			if (InterpolatedFacings != -1)
+				rotation = Util.GetInterpolatedFacing(facing, Facings, InterpolatedFacings);
 			else
-			{
 				rotation = WAngle.Zero;
-			}
 
 			return GetSprite(Start, frame, facing);
 		}

@@ -81,6 +81,12 @@ namespace OpenRA.Mods.Common
 			return new WAngle(a % step - step / 2);
 		}
 
+		public static WAngle GetInterpolatedFacing(WAngle facing, int facings, int interpolatedFacings)
+		{
+			var step = 1024 / interpolatedFacings;
+			return new WAngle(AngleDiffToStep(facing, facings).Angle / step * step);
+		}
+
 		/// <summary>Rounds the given facing value to the nearest quantized step.</summary>
 		public static WAngle QuantizeFacing(WAngle facing, int steps)
 		{
