@@ -107,6 +107,7 @@ namespace OpenRA.Mods.Common.Graphics
 		int ISpriteSequence.Length => throw exception;
 		int ISpriteSequence.Stride => throw exception;
 		int ISpriteSequence.Facings => throw exception;
+		int ISpriteSequence.InterpolatedFacings => throw exception;
 		int ISpriteSequence.Tick => throw exception;
 		int ISpriteSequence.ZOffset => throw exception;
 		int ISpriteSequence.ShadowStart => throw exception;
