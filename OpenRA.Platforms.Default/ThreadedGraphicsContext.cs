@@ -9,6 +9,10 @@
  */
 #endregion
 
+#pragma warning disable SA1512 // SingleLineCommentsMustNotBeFollowedByBlankLine
+#pragma warning disable SA1515 // SingleLineCommentMustBePrecededByBlankLine
+#pragma warning disable SA1005 // SingleLineCommentsMustBeginWithSingleSpace
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -719,7 +723,8 @@ namespace OpenRA.Platforms.Default
 			setVec3 = tuple => { var t = (ValueTuple<string, float, float>)tuple; shader.SetVec(t.Item1, t.Item2, t.Item3); };
 			setVec4 = tuple => { var t = (ValueTuple<string, float, float, float>)tuple; shader.SetVec(t.Item1, t.Item2, t.Item3, t.Item4); };
 			layoutAttributes = () => { shader.LayoutAttributes(); };
-			setRenderData = tuple => { var t = (ValueTuple<ModelRenderData>)tuple; shader.SetRenderData(t.Item1); };
+			//setRenderData = tuple => { var t = (ValueTuple<ModelRenderData>)tuple; shader.SetRenderData(t.Item1); };
+			setRenderData = tuple => { var t = (ValueTuple<ModelRenderData>)tuple; t.Item1.ApplyTo(shader); };
 		}
 
 		public void PrepareRender()

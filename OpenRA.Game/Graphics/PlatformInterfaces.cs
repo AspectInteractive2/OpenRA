@@ -121,12 +121,13 @@ namespace OpenRA
 		string FragmentShaderName { get; }
 		int Stride { get; }
 		IEnumerable<ShaderVertexAttribute> Attributes { get; }
-		void SetRenderData(IShader shader, ModelRenderData renderData);
+
+		// void SetRenderData(IShader shader, ModelRenderData renderData);
 	}
 
 	public interface IShader
 	{
-		void SetRenderData(ModelRenderData renderData);
+		// void SetRenderData(ModelRenderData renderData);
 		void SetBool(string name, bool value);
 		void SetVec(string name, float x);
 		void SetVec(string name, float x, float y);

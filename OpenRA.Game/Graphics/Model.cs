@@ -30,7 +30,7 @@ namespace OpenRA.Graphics
 		Rectangle AggregateBounds { get; }
 	}
 
-	public readonly struct ModelRenderData
+	public class ModelRenderData
 	{
 		public readonly int Start;
 		public readonly int Count;
@@ -45,6 +45,18 @@ namespace OpenRA.Graphics
 			Shader = shader;
 			VertexBuffer = vertexBuffer;
 			Textures = textures;
+		}
+
+		public void ApplyToShader()
+		{
+			foreach (var (name, texture) in Textures)
+				Shader.SetTexture(name, texture);
+		}
+
+		public void ApplyTo(IShader shader)
+		{
+			foreach (var (name, texture) in Textures)
+				shader.SetTexture(name, texture);
 		}
 	}
 

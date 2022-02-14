@@ -194,10 +194,10 @@ namespace OpenRA.Platforms.Default
 				textures[texUnit] = t;
 		}
 
-		public void SetRenderData(ModelRenderData renderData)
+		/*public void SetRenderData(ModelRenderData renderData)
 		{
 			bindings.SetRenderData(this, renderData);
-		}
+		}*/
 
 		public void SetBool(string name, bool value)
 		{

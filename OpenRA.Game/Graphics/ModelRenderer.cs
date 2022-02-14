@@ -9,6 +9,9 @@
  */
 #endregion
 
+#pragma warning disable SA1512 // SingleLineCommentsMustNotBeFollowedByBlankLine
+#pragma warning disable SA1515 // SingleLineCommentMustBePrecededByBlankLine
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -282,7 +285,8 @@ namespace OpenRA.Graphics
 			currentShader.SetVec("AmbientLight", ambientLight, 3);
 			currentShader.SetVec("DiffuseLight", diffuseLight, 3);
 
-			currentShader.SetRenderData(renderData);
+			renderData.ApplyTo(currentShader);
+			// currentShader.SetRenderData(renderData);
 
 			currentShader.PrepareRender();
 
