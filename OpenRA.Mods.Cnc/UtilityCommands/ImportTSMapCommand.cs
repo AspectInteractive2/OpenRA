@@ -17,6 +17,7 @@ using OpenRA.FileSystem;
 using OpenRA.Mods.Cnc.FileFormats;
 using OpenRA.Mods.Common;
 using OpenRA.Mods.Common.FileFormats;
+using OpenRA.Mods.Common.MapFormats;
 using OpenRA.Mods.Common.Terrain;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Primitives;
@@ -271,7 +272,7 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 			if (!utility.ModData.DefaultTerrainInfo.TryGetValue(tileset, out var terrainInfo))
 				throw new InvalidDataException($"Unknown tileset {tileset}");
 
-			var map = new Map(Game.ModData, terrainInfo, size.Width, size.Height)
+			var map = new DefaultMap(Game.ModData, terrainInfo, size.Width, size.Height)
 			{
 				Title = basic.GetValue("Name", Path.GetFileNameWithoutExtension(filename)),
 				Author = "Westwood Studios",
