@@ -89,8 +89,8 @@ namespace OpenRA.Mods.Common.UtilityCommands
 					if (package == null)
 						continue;
 
-					var testMap = new Map(modData, package);
-					TestMap(testMap, modData);
+					var testMap = modData.MapLoader.Load(modData, package);
+					TestMap((IMap)testMap, modData);
 				}
 
 				if (errors > 0)
@@ -106,8 +106,10 @@ namespace OpenRA.Mods.Common.UtilityCommands
 			}
 		}
 
-		void TestMap(Map map, ModData modData)
+		void TestMap(IMap imap, ModData modData)
 		{
+			var map = (Map)imap;
+
 			Console.WriteLine($"Testing map: {map.Title}");
 
 			// Lint tests can't be trusted if the map rules are bogus
@@ -120,7 +122,7 @@ namespace OpenRA.Mods.Common.UtilityCommands
 
 			// Run all rule checks on the map if it defines custom rules.
 			if (map.RuleDefinitions != null || map.VoiceDefinitions != null || map.WeaponDefinitions != null)
-				CheckRules(modData, map.Rules);
+				CheckRules(modData, imap.Rules);
 
 			// Run all map-level checks here.
 			foreach (var customMapPassType in modData.ObjectCreator.GetTypesImplementing<ILintMapPass>())
@@ -128,7 +130,7 @@ namespace OpenRA.Mods.Common.UtilityCommands
 				try
 				{
 					var customMapPass = (ILintMapPass)modData.ObjectCreator.CreateBasic(customMapPassType);
-					customMapPass.Run(EmitError, EmitWarning, modData, map);
+					customMapPass.Run(EmitError, EmitWarning, modData, imap);
 				}
 				catch (Exception e)
 				{

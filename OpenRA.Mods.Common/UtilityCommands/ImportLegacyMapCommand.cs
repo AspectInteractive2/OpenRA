@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text;
 using OpenRA.FileSystem;
 using OpenRA.Mods.Common.FileFormats;
+using OpenRA.Mods.Common.MapFormats;
 using OpenRA.Mods.Common.Terrain;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Primitives;
@@ -69,14 +70,14 @@ namespace OpenRA.Mods.Common.UtilityCommands
 				if (!ModData.DefaultTerrainInfo.TryGetValue(tileset, out var terrainInfo))
 					throw new InvalidDataException($"Unknown tileset {tileset}");
 
-				Map = new Map(ModData, terrainInfo, MapSize, MapSize)
+				Map = new DefaultMap(ModData, terrainInfo, MapSize, MapSize)
 				{
 					Title = basic.GetValue("Name", Path.GetFileNameWithoutExtension(filename)),
 					Author = "Westwood Studios",
 					RequiresMod = ModData.Manifest.Id
 				};
 
-				SetBounds(Map, mapSection);
+				SetBounds((IMap)Map, mapSection);
 
 				ReadPacks(file, filename);
 				ReadTrees(file);
@@ -92,15 +93,15 @@ namespace OpenRA.Mods.Common.UtilityCommands
 				LoadWaypoints(waypoints);
 
 				// Create default player definitions only if there are no players to import
-				MapPlayers = new MapPlayers(Map.Rules, Players.Count == 0 ? spawnCount : 0);
+				MapPlayers = new MapPlayers(((IMap)Map).Rules, Players.Count == 0 ? spawnCount : 0);
 				foreach (var p in Players)
 					LoadPlayer(file, p);
 
 				Map.PlayerDefinitions = MapPlayers.ToMiniYaml();
 			}
 
-			if (Map.Rules.TerrainInfo is ITerrainInfoNotifyMapCreated notifyMapCreated)
-				notifyMapCreated.MapCreated(Map);
+			if (((IMap)Map).Rules.TerrainInfo is ITerrainInfoNotifyMapCreated notifyMapCreated)
+				notifyMapCreated.MapCreated((IMap)Map);
 
 			var dest = Path.GetFileNameWithoutExtension(args[1]) + ".oramap";
 
@@ -158,7 +159,7 @@ namespace OpenRA.Mods.Common.UtilityCommands
 			missionData.Value.Nodes.Add(new MiniYamlNode("Briefing", briefing.Replace("\n", " ").ToString()));
 		}
 
-		static void SetBounds(Map map, IniSection mapSection)
+		static void SetBounds(IMap map, IniSection mapSection)
 		{
 			var offsetX = Exts.ParseIntegerInvariant(mapSection.GetValue("X", "0"));
 			var offsetY = Exts.ParseIntegerInvariant(mapSection.GetValue("Y", "0"));
@@ -222,9 +223,9 @@ namespace OpenRA.Mods.Common.UtilityCommands
 
 		public virtual void ReadActors(IniFile file)
 		{
-			LoadActors(file, "STRUCTURES", Players, Map);
-			LoadActors(file, "UNITS", Players, Map);
-			LoadActors(file, "INFANTRY", Players, Map);
+			LoadActors(file, "STRUCTURES", Players, (IMap)Map);
+			LoadActors(file, "UNITS", Players, (IMap)Map);
+			LoadActors(file, "INFANTRY", Players, (IMap)Map);
 		}
 
 		public abstract void LoadPlayer(IniFile file, string section);
@@ -378,7 +379,7 @@ namespace OpenRA.Mods.Common.UtilityCommands
 			return new CPos(loc % MapSize, loc / MapSize);
 		}
 
-		public void LoadActors(IniFile file, string section, List<string> players, Map map)
+		public void LoadActors(IniFile file, string section, List<string> players, IMap map)
 		{
 			foreach (var s in file.GetSection(section, true))
 			{
@@ -414,12 +415,12 @@ namespace OpenRA.Mods.Common.UtilityCommands
 					if (section == "INFANTRY")
 						actor.Add(new SubCellInit((SubCell)Exts.ParseByte(parts[4])));
 
-					var actorCount = map.ActorDefinitions.Count;
+					var actorCount = ((Map)map).ActorDefinitions.Count;
 
 					if (!map.Rules.Actors.ContainsKey(parts[1].ToLowerInvariant()))
 						Console.WriteLine($"Ignoring unknown actor type: `{parts[1].ToLowerInvariant()}`");
 					else
-						map.ActorDefinitions.Add(new MiniYamlNode("Actor" + actorCount++, actor.Save()));
+						((Map)map).ActorDefinitions.Add(new MiniYamlNode("Actor" + actorCount++, actor.Save()));
 				}
 				catch (Exception)
 				{

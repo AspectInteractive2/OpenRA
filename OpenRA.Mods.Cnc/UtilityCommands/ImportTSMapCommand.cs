@@ -17,6 +17,7 @@ using OpenRA.FileSystem;
 using OpenRA.Mods.Cnc.FileFormats;
 using OpenRA.Mods.Common;
 using OpenRA.Mods.Common.FileFormats;
+using OpenRA.Mods.Common.MapFormats;
 using OpenRA.Mods.Common.Terrain;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Primitives;
@@ -271,7 +272,7 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 			if (!utility.ModData.DefaultTerrainInfo.TryGetValue(tileset, out var terrainInfo))
 				throw new InvalidDataException($"Unknown tileset {tileset}");
 
-			var map = new Map(Game.ModData, terrainInfo, size.Width, size.Height)
+			var map = new DefaultMap(Game.ModData, terrainInfo, size.Width, size.Height)
 			{
 				Title = basic.GetValue("Name", Path.GetFileNameWithoutExtension(filename)),
 				Author = "Westwood Studios",
@@ -332,7 +333,7 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 			}
 		}
 
-		static void ReadTiles(Map map, IniFile file, int2 fullSize)
+		static void ReadTiles(IMap map, IniFile file, int2 fullSize)
 		{
 			var terrainInfo = (ITemplatedTerrainInfo)Game.ModData.DefaultTerrainInfo[map.Tileset];
 			var mapSection = file.GetSection("IsoMapPack5");
@@ -359,19 +360,21 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 				var mapCell = new MPos(dx / 2, dy);
 				var cell = mapCell.ToCPos(map);
 
-				if (map.Tiles.Contains(cell))
+				if (((IMapTiles)map).Tiles.Contains(cell))
 				{
 					if (!terrainInfo.Templates.ContainsKey(tilenum))
 						tilenum = subtile = 0;
 
-					map.Tiles[cell] = new TerrainTile(tilenum, subtile);
-					map.Height[cell] = z;
+					((IMapTiles)map).Tiles[cell] = new TerrainTile(tilenum, subtile);
+					((IMapElevation)map).Height[cell] = z;
 				}
 			}
 		}
 
-		static void ReadOverlay(Map map, IniFile file, int2 fullSize)
+		static void ReadOverlay(IMap map, IniFile file, int2 fullSize)
 		{
+			var mapResource = (IMapResource)map;
+
 			var overlaySection = file.GetSection("OverlayPack");
 			var overlayCompressed = Convert.FromBase64String(string.Concat(overlaySection.Select(kvp => kvp.Value)));
 			var overlayPack = new byte[1 << 18];
@@ -383,7 +386,7 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 			var overlayDataPack = new byte[1 << 18];
 			UnpackLCW(overlayDataCompressed, overlayDataPack, temp);
 
-			var overlayIndex = new CellLayer<int>(map);
+			var overlayIndex = new CellLayer<int>((IMap)map);
 			overlayIndex.Clear(0xFF);
 
 			for (var y = 0; y < fullSize.Y; y++)
@@ -397,7 +400,7 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 					var rx = (ushort)((dx + dy) / 2 + 1);
 					var ry = (ushort)(dy - rx + fullSize.X + 1);
 
-					if (!map.Resources.Contains(uv))
+					if (!mapResource.Resources.Contains(uv))
 						continue;
 
 					overlayIndex[uv] = rx + 512 * ry;
@@ -455,7 +458,7 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 							ar.Add(new HealthInit(health));
 					}
 
-					map.ActorDefinitions.Add(new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save()));
+					((Map)map).ActorDefinitions.Add(new MiniYamlNode("Actor" + ((Map)map).ActorDefinitions.Count, ar.Save()));
 
 					continue;
 				}
@@ -469,7 +472,7 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 						continue;
 
 					// Pick half or full density based on the frame
-					map.Resources[cell] = new ResourceTile(3, (byte)(frame == 52 ? 1 : 2));
+					mapResource.Resources[cell] = new ResourceTile(3, (byte)(frame == 52 ? 1 : 2));
 					continue;
 				}
 
@@ -480,7 +483,7 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 
 				if (resourceType != 0)
 				{
-					map.Resources[cell] = new ResourceTile(resourceType, overlayDataPack[overlayIndex[cell]]);
+					mapResource.Resources[cell] = new ResourceTile(resourceType, overlayDataPack[overlayIndex[cell]]);
 					continue;
 				}
 
@@ -488,7 +491,7 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 			}
 		}
 
-		static void ReadWaypoints(Map map, IniFile file, int2 fullSize)
+		static void ReadWaypoints(IMap map, IniFile file, int2 fullSize)
 		{
 			var waypointsSection = file.GetSection("Waypoints", true);
 			foreach (var kv in waypointsSection)
@@ -506,11 +509,11 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 					new OwnerInit("Neutral")
 				};
 
-				map.ActorDefinitions.Add(new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save()));
+				((Map)map).ActorDefinitions.Add(new MiniYamlNode("Actor" + ((Map)map).ActorDefinitions.Count, ar.Save()));
 			}
 		}
 
-		static void ReadTerrainActors(Map map, IniFile file, int2 fullSize)
+		static void ReadTerrainActors(IMap map, IniFile file, int2 fullSize)
 		{
 			var terrainSection = file.GetSection("Terrain", true);
 			foreach (var kv in terrainSection)
@@ -532,11 +535,11 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 				if (!map.Rules.Actors.ContainsKey(name))
 					Console.WriteLine($"Ignoring unknown actor type: `{name}`");
 				else
-					map.ActorDefinitions.Add(new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save()));
+					((Map)map).ActorDefinitions.Add(new MiniYamlNode("Actor" + ((Map)map).ActorDefinitions.Count, ar.Save()));
 			}
 		}
 
-		static void ReadActors(Map map, IniFile file, string type, int2 fullSize)
+		static void ReadActors(IMap map, IniFile file, string type, int2 fullSize)
 		{
 			var structuresSection = file.GetSection(type, true);
 			foreach (var kv in structuresSection)
@@ -592,11 +595,11 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 				if (!map.Rules.Actors.ContainsKey(name))
 					Console.WriteLine($"Ignoring unknown actor type: `{name}`");
 				else
-					map.ActorDefinitions.Add(new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save()));
+					((Map)map).ActorDefinitions.Add(new MiniYamlNode("Actor" + ((Map)map).ActorDefinitions.Count, ar.Save()));
 			}
 		}
 
-		static void ReadLighting(Map map, IniFile file)
+		static void ReadLighting(IMap map, IniFile file)
 		{
 			var lightingTypes = new Dictionary<string, string>()
 			{
@@ -636,14 +639,14 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 
 			if (lightingNodes.Count > 0)
 			{
-				map.RuleDefinitions.Nodes.Add(new MiniYamlNode("^BaseWorld", new MiniYaml("", new List<MiniYamlNode>()
+				((Map)map).RuleDefinitions.Nodes.Add(new MiniYamlNode("^BaseWorld", new MiniYaml("", new List<MiniYamlNode>()
 				{
 					new MiniYamlNode("TerrainLighting", new MiniYaml("", lightingNodes))
 				})));
 			}
 		}
 
-		static void ReadLamps(Map map, IniFile file)
+		static void ReadLamps(IMap map, IniFile file)
 		{
 			var lightingTypes = new Dictionary<string, string>()
 			{
@@ -676,7 +679,7 @@ namespace OpenRA.Mods.Cnc.UtilityCommands
 
 				if (lightingNodes.Count > 0)
 				{
-					map.RuleDefinitions.Nodes.Add(new MiniYamlNode(lamp, new MiniYaml("", new List<MiniYamlNode>()
+					((Map)map).RuleDefinitions.Nodes.Add(new MiniYamlNode(lamp, new MiniYaml("", new List<MiniYamlNode>()
 					{
 						new MiniYamlNode("TerrainLightSource", new MiniYaml("", lightingNodes))
 					})));
