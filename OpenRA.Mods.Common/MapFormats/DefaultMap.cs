@@ -243,10 +243,12 @@ namespace OpenRA.Mods.Common.MapFormats
 			: base(modData)
 		{
 			var tileRef = terrainInfo.DefaultTerrainTile;
+			var size = new Size(width, height);
 
 			Title = "Name your map here";
 			Author = "Your name here";
 
+			MapSize = new int2(size);
 			Tileset = terrainInfo.Id;
 
 			NewSize(new Size(width, height), terrainInfo);
@@ -286,7 +288,11 @@ namespace OpenRA.Mods.Common.MapFormats
 				rules = Ruleset.LoadDefaultsForTileSet(modData, Tileset);
 			}
 
-			NewSize(new Size(MapSize.X, MapSize.Y), rules.TerrainInfo);
+			var size = new Size(MapSize.X, MapSize.Y);
+			Tiles = new CellLayer<TerrainTile>(Grid.Type, size);
+			Resources = new CellLayer<ResourceTile>(Grid.Type, size);
+			Height = new CellLayer<byte>(Grid.Type, size);
+			Ramp = new CellLayer<byte>(Grid.Type, size);
 
 			using (var s = Package.GetStream("map.bin"))
 			{

@@ -94,10 +94,10 @@ namespace OpenRA
 		/// </summary>
 		public WPos ProjectedBottomRight { get; private set; }
 
-		public CellLayer<TerrainTile> Tiles { get; private set; }
-		public CellLayer<ResourceTile> Resources { get; private set; }
-		public CellLayer<byte> Height { get; private set; }
-		public CellLayer<byte> Ramp { get; private set; }
+		public CellLayer<TerrainTile> Tiles { get; protected set; }
+		public CellLayer<ResourceTile> Resources { get; protected set; }
+		public CellLayer<byte> Height { get; protected set; }
+		public CellLayer<byte> Ramp { get; protected set; }
 		public CellLayer<byte> CustomTerrain { get; private set; }
 
 		public PPos[] ProjectedCells { get; private set; }
