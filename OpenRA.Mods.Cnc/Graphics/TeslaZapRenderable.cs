@@ -163,5 +163,15 @@ namespace OpenRA.Mods.Cnc.Graphics
 
 			return rs;
 		}
+
+		public void Dispose()
+		{
+			throw new NotImplementedException();
+		}
+
+		public void AddOrUpdateScreenMap()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

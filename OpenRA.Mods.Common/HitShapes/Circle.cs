@@ -60,8 +60,8 @@ namespace OpenRA.Mods.Common.HitShapes
 		IEnumerable<IRenderable> IHitShape.RenderDebugOverlay(HitShape hs, WorldRenderer wr, WPos origin, WRot orientation)
 		{
 			var shapeColor = hs.IsTraitDisabled ? Color.LightGray : Color.Yellow;
-			yield return new CircleAnnotationRenderable(origin + new WVec(0, 0, VerticalTopOffset), Radius, 1, shapeColor);
-			yield return new CircleAnnotationRenderable(origin + new WVec(0, 0, VerticalBottomOffset), Radius, 1, shapeColor);
+			yield return new CircleAnnotationRenderable(wr.World, origin + new WVec(0, 0, VerticalTopOffset), Radius, 1, shapeColor);
+			yield return new CircleAnnotationRenderable(wr.World, origin + new WVec(0, 0, VerticalBottomOffset), Radius, 1, shapeColor);
 		}
 	}
 }

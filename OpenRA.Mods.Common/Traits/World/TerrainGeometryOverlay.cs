@@ -78,7 +78,7 @@ namespace OpenRA.Mods.Common.Traits
 						var end = pos + p[j];
 						var startColor = colors[height + p[i].Z / 512];
 						var endColor = colors[height + p[j].Z / 512];
-						yield return new LineAnnotationRenderable(start, end, width, startColor, endColor);
+						yield return new LineAnnotationRenderable(wr.World, start, end, width, startColor, endColor);
 					}
 				}
 			}
@@ -93,7 +93,7 @@ namespace OpenRA.Mods.Common.Traits
 					var j = (i + 1) % 4;
 					var start = pos + projectedCorners[i] - new WVec(0, 0, pos.Z);
 					var end = pos + projectedCorners[j] - new WVec(0, 0, pos.Z);
-					yield return new LineAnnotationRenderable(start, end, 3, Color.Navy);
+					yield return new LineAnnotationRenderable(wr.World, start, end, 3, Color.Navy);
 				}
 			}
 		}
